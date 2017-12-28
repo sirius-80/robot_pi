@@ -34,6 +34,8 @@ def led(on_off):
 class WiimoteControl(object):
     def __init__(self):
         self.STICK_THRESHOLD = 2
+        self.STICK_CENTER_POSITION = (127, 127)
+        self.last_direction = (0, 0)
         self._connect()
         self.wiimote.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
         self.wiimote.enable(cwiid.FLAG_MESG_IFC)
@@ -41,8 +43,6 @@ class WiimoteControl(object):
         self.wiimote.led = 9
         # Nunchuk needs some time to start reporting
         time.sleep(.2)
-        self.nunchuk_default_position = (127, 127)
-        self.last_direction = numpy.subtract(self.nunchuk_default_position, self.wiimote.state['nunchuk']['stick'])
 
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
@@ -78,7 +78,7 @@ class WiimoteControl(object):
             if mesg[0] == cwiid.MESG_NUNCHUK:
                 # {'acc': (76, 127, 139), 'buttons': 0, 'stick': (126, 127)}
                 stick = mesg[1]['stick']
-                direction = numpy.subtract(stick, self.nunchuk_default_position)
+                direction = numpy.subtract(stick, self.STICK_CENTER_POSITION)
                 change = numpy.subtract(self.last_direction, direction)
                 if abs(change[0]) >= self.STICK_THRESHOLD or abs(change[1]) >= self.STICK_THRESHOLD:
                     print("Direction", direction)
