@@ -16,12 +16,11 @@ class GpioController(object):
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
         self.blinking = False
         self.executor = concurrent.futures.ThreadPoolExecutor(4)
-        GPIO.add_event_detect(GPIO.BCM, GPIO.RISING)
-        GPIO.add_event_callback(GPIO.BCM, self.led_blinking_fast)
+        GPIO.add_event_detect(23, GPIO.RISING)
+        GPIO.add_event_callback(23, self.led_blinking_fast)
 
     def led_blinking_fast(self):
-        if not GPIO.input(23):
-            self.led_blinking(10)
+        self.led_blinking(10)
 
     def led_blinking(self, frequency_hz=3):
         self.blinking = True
