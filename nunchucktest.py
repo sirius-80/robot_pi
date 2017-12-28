@@ -46,6 +46,8 @@ def main():
     wm=cwiid.Wiimote()
     wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
     wm.led = LED_1_AND_4_ON
+    wm.mesg_callback = wiimote_msg_callback
+    wm.enable(cwiid.FLAG_MESG_IFC)
 
     print('Wii Remote connected...')
     print('\nPress the HOME button to disconnect the Wii and end the application')
@@ -54,7 +56,6 @@ def main():
     time.sleep(0.5)
     print wm.state
 
-    wm.mesg_callback = wiimote_msg_callback
     active = True
     nunchuk_initial_position = wm.state['nunchuk']['stick']
     while active:
