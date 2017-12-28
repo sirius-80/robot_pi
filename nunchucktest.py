@@ -23,6 +23,7 @@ class GpioController(object):
         self.led_blinking(10)
 
     def led_blinking(self, frequency_hz=3):
+        self.led(False)
         self.blinking = True
 
         def do_blink():
