@@ -37,6 +37,8 @@ def rumble(wiimote):
 def wiimote_msg_callback(msg_list, msg_time):
     print("Received", len(msg_list), "messages at time", msg_time, "...")
     for msg in msg_list:
+        if msg['buttons']:
+            print("Buttons:", msg['buttons'])
         print(msg)
     print("")
 
@@ -59,6 +61,7 @@ def main():
     active = True
     nunchuk_initial_position = wm.state['nunchuk']['stick']
     while active:
+        time.sleep(1)
         stick = wm.state['nunchuk']['stick']
         x, y = [stick[i] - nunchuk_initial_position[i] for i in range(2)]
         if abs(x) > OFFSET or abs(y) > OFFSET:
