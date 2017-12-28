@@ -54,7 +54,6 @@ class WiimoteControl(object):
                 self.rumble()
             except RuntimeError:
                 logging.warn("Timed out waiting for wii-remote, trying again...")
-                traceback.print_exc()
             except KeyboardInterrupt:
                 logging.warn("Interrupted. Stopping.")
 
@@ -83,7 +82,7 @@ class WiimoteControl(object):
     def connected(self):
         return self._connected
 
-    def rumble(self, duration_seconds=0.2):
+    def rumble(self, duration_seconds=0.1):
         self.wiimote.rumble = 1
         time.sleep(duration_seconds)
         self.wiimote.rumble = 0
