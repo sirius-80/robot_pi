@@ -5,6 +5,7 @@ import logging
 import numpy
 import RPi.GPIO as GPIO
 import time
+import concurrent.futures
 
 
 class GpioController(object):
@@ -13,6 +14,20 @@ class GpioController(object):
         GPIO.setwarnings(False)
         GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Button to GPIO23
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
+        self.blinking = False
+        self.executor = concurrent.futures.ThreadPoolExecutor(4)
+
+    def led_blinking(self, on_off):
+        self.blinking = on_off
+
+        def do_blink():
+            while self.blinking:
+                self.led(True)
+                time.sleep(.333333/2)
+                self.led(False)
+                time.sleep(.333333/2)
+        if on_off:
+            self.executor.submit(do_blink)
 
     def led(self, on_off):
         """Turn led (connected to pin 24) <on_off>"""
@@ -67,19 +82,6 @@ class WiimoteControl(object):
                     args = self.button_callback_functions[button][1]
                     kwargs = self.button_callback_functions[button][2]
                     func(*args, **kwargs)
-
-                # if mesg[1] == cwiid.BTN_PLUS:
-                #     logging.info("LED on")
-                #     self.rumble()
-                #     led(True)
-                # if mesg[1] == cwiid.BTN_MINUS:
-                #     self.rumble()
-                #     led(False)
-                #     logging.info("LED of")
-                # if mesg[1] == cwiid.BTN_HOME:
-                #     logging.info("Quiting!")
-                #     self._connected = False
-
             if mesg[0] == cwiid.MESG_NUNCHUK:
                 # {'acc': (76, 127, 139), 'buttons': 0, 'stick': (126, 127)}
                 stick = mesg[1]['stick']
@@ -111,6 +113,8 @@ def main():
     wii_controller.on_button(cwiid.BTN_HOME, wii_controller.close)
     wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, True)
     wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, False)
+    wii_controller.on_button(cwiid.BTN_A, board_controller.led_blinking, True)
+    wii_controller.on_button(cwiid.BTN_B, board_controller.led_blinking, False)
 
     try:
         while wii_controller.connected():
