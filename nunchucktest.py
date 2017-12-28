@@ -33,7 +33,7 @@ def led(on_off):
 
 class WiimoteControl(object):
     def __init__(self):
-        self.STICK_THRESHOLD = 2
+        self.STICK_THRESHOLD = 1
         self.STICK_CENTER_POSITION = (127, 127)
         self.last_direction = (0, 0)
         self._connect()
