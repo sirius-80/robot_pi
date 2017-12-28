@@ -4,7 +4,7 @@ import cwiid
 import logging
 import time
 import traceback
-
+import numpy
 import RPi.GPIO as GPIO
 import time
 
@@ -21,7 +21,7 @@ OFFSET = 5
 
 
 def pressed(button_state, button_code):
-	return button_state & button_code == button_code
+    return button_state & button_code == button_code
 
 
 def led(on_off):
@@ -33,11 +33,12 @@ def led(on_off):
 
 class WiimoteControl(object):
     def __init__(self):
+        self.STICK_THRESHOLD = 5
         self._connect()
         self.wiimote.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
         self.wiimote.enable(cwiid.FLAG_MESG_IFC)
         self.wiimote.mesg_callback = self._wii_msg_callback
-        nunchuk_initial_position = self.wiimote.state['nunchuk']['stick']
+        self.nunchuk_initial_position = self.wiimote.state['nunchuk']['stick']
 
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
@@ -68,17 +69,22 @@ class WiimoteControl(object):
                     self._connected = False
 
             if mesg[0] == cwiid.MESG_NUNCHUK:
-                print(mesg[1])
+                # {'acc': (76, 127, 139), 'buttons': 0, 'stick': (126, 127)}
+                stick = mesg[1]['stick']
+                direction = numpy.subtract(self.nunchuk_initial_position, stick)
+                if direction[0] >= self.STICK_THRESHOLD and direction[1] >= self.STICK_THRESHOLD:
+                    print("Direction", direction)
 
     def connected(self):
         return self._connected
 
-    def rumble(self):
+    def rumble(self, duration_seconds=0.2):
         self.wiimote.rumble = 1
-        time.sleep(0.2)
+        time.sleep(duration_seconds)
         self.wiimote.rumble = 0
 
     def close(self):
+        self.rumble(0.5)
         self.wiimote.close()
 
 
