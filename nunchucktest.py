@@ -87,10 +87,6 @@ class WiimoteControl(object):
         self.wiimote.close()
 
 
-def connect_wiimote():
-
-
-
 def main():
     controller = WiimoteControl()
     try:
