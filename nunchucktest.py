@@ -98,7 +98,8 @@ class WiimoteControl(object):
         self.wiimote.rumble = 0
 
     def close(self):
-        self.rumble(0.5)
+        if self._connected:
+            self.rumble(0.5)
         self.wiimote.close()
         self._connected = False
 
@@ -113,7 +114,7 @@ def main():
 
     try:
         while wii_controller.connected():
-            time.sleep(1)
+            time.sleep(.1)
     finally:
         board_controller.close()
         wii_controller.close()
