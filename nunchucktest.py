@@ -19,17 +19,20 @@ class GpioController(object):
 
     def led_blinking(self, on_off):
         self.blinking = on_off
-
         def do_blink():
             while self.blinking:
-                self.led(True)
+                self._led(True)
                 time.sleep(.333333/2)
-                self.led(False)
+                self._led(False)
                 time.sleep(.333333/2)
         if on_off:
             self.executor.submit(do_blink)
 
     def led(self, on_off):
+        self.blinking = False
+        self._led(on_off)
+
+    def _led(self, on_off):
         """Turn led (connected to pin 24) <on_off>"""
         signal = on_off and GPIO.HIGH or GPIO.LOW
         GPIO.output(24, signal)
