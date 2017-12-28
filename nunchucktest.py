@@ -57,7 +57,6 @@ def main():
 
         btns = wm.state['buttons']
         if pressed(btns, cwiid.BTN_HOME):
-            wm.close()
             active = False
 
         if pressed(btns, cwiid.BTN_PLUS):
@@ -69,6 +68,7 @@ def main():
     print("Bye")
     rumble(wm)
     led(False)
+    wm.close()
 
 
 if __name__ == "__main__":
