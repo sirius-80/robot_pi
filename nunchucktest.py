@@ -28,14 +28,22 @@ def led(on_off):
     print("LED ", on_off)
 
 
+def rumble(wiimote):
+    wiimote.rumble = 1
+    time.sleep(0.5)
+    wiimote.rumble = 0
+
+
 def main():
     print('Press button 1 + 2 on your Wii Remote...')
     wm=cwiid.Wiimote()
+    wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
     wm.led = LED_1_AND_4_ON
+
     print('Wii Remote connected...')
     print('\nPress the HOME button to disconnect the Wii and end the application')
+    rumble(wm)
 
-    wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
     time.sleep(0.5)
     print wm.state
 
@@ -59,6 +67,7 @@ def main():
             led(False)
 	
     print("Bye")
+    rumble(wm)
     led(False)
 
 
