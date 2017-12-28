@@ -2,33 +2,27 @@
 
 import cwiid
 import logging
-import time
-import traceback
 import numpy
 import RPi.GPIO as GPIO
 import time
 
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+class GpioController(object):
+    def __init__(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setwarnings(False)
+        GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Button to GPIO23
+        GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
 
-GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)#Button to GPIO23
-GPIO.setup(24, GPIO.OUT)  #LED to GPIO24
+    def led(on_off):
+        """Turn led (connected to pin 24) <on_off>"""
+        signal = on_off and GPIO.HIGH or GPIO.LOW
+        GPIO.output(24, signal)
+        logging.info("LED {}", on_off and "on" or "off")
 
-
-LED_1_AND_4_ON = 9
-OFFSET = 5
-
-
-def pressed(button_state, button_code):
-    return button_state & button_code == button_code
-
-
-def led(on_off):
-    """Turn led <on_off>"""
-    signal = on_off and GPIO.HIGH or GPIO.LOW
-    GPIO.output(24, signal)
-    print("LED ", on_off)
+    def close(self):
+        self.led(False)
+        GPIO.cleanup()
 
 
 class WiimoteControl(object):
@@ -41,8 +35,12 @@ class WiimoteControl(object):
         self.wiimote.enable(cwiid.FLAG_MESG_IFC)
         self.wiimote.mesg_callback = self._wii_msg_callback
         self.wiimote.led = 9
+        self.button_callback_functions = {}
         # Nunchuk needs some time to start reporting
         time.sleep(.2)
+
+    def on_button(self, button, function, *args, **kwargs):
+        self.button_callback_functions[button] = (function, args, kwargs)
 
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
@@ -63,17 +61,21 @@ class WiimoteControl(object):
     def _wii_msg_callback(self, mesg_list, time):
         for mesg in mesg_list:
             if mesg[0] == cwiid.MESG_BTN:
-                if mesg[1] == cwiid.BTN_PLUS:
-                    logging.info("LED on")
-                    self.rumble()
-                    led(True)
-                if mesg[1] == cwiid.BTN_MINUS:
-                    self.rumble()
-                    led(False)
-                    logging.info("LED of")
-                if mesg[1] == cwiid.BTN_HOME:
-                    logging.info("Quiting!")
-                    self._connected = False
+                button = mesg[1]
+                if button in self.button_callback_functions:
+                    self.button_callback_functions[button][0](*self.button_callback_functions[1], **self.button_callback_functions[2])
+
+                # if mesg[1] == cwiid.BTN_PLUS:
+                #     logging.info("LED on")
+                #     self.rumble()
+                #     led(True)
+                # if mesg[1] == cwiid.BTN_MINUS:
+                #     self.rumble()
+                #     led(False)
+                #     logging.info("LED of")
+                # if mesg[1] == cwiid.BTN_HOME:
+                #     logging.info("Quiting!")
+                #     self._connected = False
 
             if mesg[0] == cwiid.MESG_NUNCHUK:
                 # {'acc': (76, 127, 139), 'buttons': 0, 'stick': (126, 127)}
@@ -95,53 +97,23 @@ class WiimoteControl(object):
     def close(self):
         self.rumble(0.5)
         self.wiimote.close()
+        self._connected = False
 
 
 def main():
-    controller = WiimoteControl()
+    wii_controller = WiimoteControl()
+    board_controller = GpioController()
+
+    wii_controller.on_button(cwiid.BTN_HOME, wii_controller.close)
+    wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, [True])
+    wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, [False])
+
     try:
-        while controller.connected():
+        while wii_controller.connected():
             time.sleep(1)
     finally:
-        led(False)
-        controller.close()
-
-
-def main_old():
-    wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
-    wm.led = LED_1_AND_4_ON
-    wm.mesg_callback = wiimote_msg_callback
-
-    print('Wii Remote connected...')
-    print('\nPress the HOME button to disconnect the Wii and end the application')
-    rumble(wm)
-
-    time.sleep(0.5)
-    print wm.state
-
-    active = True
-    nunchuk_initial_position = wm.state['nunchuk']['stick']
-    while active:
-        time.sleep(.1)
-        # stick = wm.state['nunchuk']['stick']
-        # x, y = [stick[i] - nunchuk_initial_position[i] for i in range(2)]
-        # if abs(x) > OFFSET or abs(y) > OFFSET:
-        #   print x, y
-        #
-        # btns = wm.state['buttons']
-        # if pressed(btns, cwiid.BTN_HOME):
-        #     active = False
-        #
-        # if pressed(btns, cwiid.BTN_PLUS):
-        #     led(True)
-        #
-        # if pressed(btns, cwiid.BTN_MINUS):
-        #     led(False)
-	
-    print("Bye")
-    rumble(wm)
-    led(False)
-    wm.close()
+        board_controller.close()
+        wii_controller.close()
 
 
 if __name__ == "__main__":
