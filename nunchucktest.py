@@ -44,15 +44,19 @@ class WiimoteControl(object):
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
         self.wiimote = None
-        # while not wiimote:
-        try:
-            self.wiimote = cwiid.Wiimote()
-            self._connected = True
-        except:
-            traceback.print_exc()
-        print('Wii Remote connected...')
-        print('\nPress the HOME button to disconnect the Wii and end the application')
-        self.rumble()
+        self._connected = False
+        while not self.wiimote:
+            try:
+                self.wiimote = cwiid.Wiimote()
+                self._connected = True
+                print('Wii Remote connected...')
+                print('\nPress the HOME button to disconnect the Wii and end the application')
+                self.rumble()
+            except RuntimeError:
+                logging.warn("Timed out waiting for wii-remote, trying again...")
+                traceback.print_exc()
+            except KeyboardInterrupt:
+                logging.warn("Interrupted. Stopping.")
 
     def _wii_msg_callback(self, mesg_list, time):
         for mesg in mesg_list:
