@@ -63,7 +63,10 @@ class WiimoteControl(object):
             if mesg[0] == cwiid.MESG_BTN:
                 button = mesg[1]
                 if button in self.button_callback_functions:
-                    self.button_callback_functions[button][0](*self.button_callback_functions[1], **self.button_callback_functions[2])
+                    func = self.button_callback_functions[button][0]
+                    args = self.button_callback_functions[button][1]
+                    kwargs = self.button_callback_functions[button][2]
+                    func(*args, **kwargs)
 
                 # if mesg[1] == cwiid.BTN_PLUS:
                 #     logging.info("LED on")
