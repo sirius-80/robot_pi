@@ -31,19 +31,6 @@ def led(on_off):
     print("LED ", on_off)
 
 
-def rumble(wiimote):
-
-
-
-def wiimote_msg_callback(msg_list, msg_time):
-    #print("Received", len(msg_list), "messages at time", msg_time, "...")
-    for msg in msg_list:
-        if msg[0] == cwiid.MESG_BTN:
-            print("Buttons:", msg[1])
-        elif msg[0] == cwiid.MESG_NUNCHUK:
-            pass
-
-
 class WiimoteControl(object):
     def __init__(self):
         self._connect()
