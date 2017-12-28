@@ -14,7 +14,7 @@ class GpioController(object):
         GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Button to GPIO23
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
 
-    def led(on_off):
+    def led(self, on_off):
         """Turn led (connected to pin 24) <on_off>"""
         signal = on_off and GPIO.HIGH or GPIO.LOW
         GPIO.output(24, signal)
