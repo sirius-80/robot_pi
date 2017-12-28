@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 import cwiid
@@ -60,6 +59,7 @@ def main():
             led(False)
 	
     print("Bye")
+    led(False)
 
 
 if __name__ == "__main__":
