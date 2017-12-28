@@ -37,8 +37,11 @@ def rumble(wiimote):
 def wiimote_msg_callback(msg_list, msg_time):
     print("Received", len(msg_list), "messages at time", msg_time, "...")
     for msg in msg_list:
-        if msg[1]['buttons']:
-            print("Buttons:", msg[1]['buttons'])
+        try:
+            if msg[1]['buttons']:
+                print("Buttons:", msg[1]['buttons'])
+        except:
+            print "Failed to parse message: ", msg
     print("")
 
 
