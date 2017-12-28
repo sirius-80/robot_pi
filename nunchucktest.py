@@ -23,8 +23,8 @@ class GpioController(object):
         self.led_blinking(10)
 
     def led_blinking(self, frequency_hz=3):
-        self.led(False)
-        self.blinking = True
+        if self.blinking:
+            self.blinking.result()
 
         def do_blink():
             while self.blinking:
@@ -32,7 +32,7 @@ class GpioController(object):
                 time.sleep(0.5/frequency_hz)
                 self._led(False)
                 time.sleep(0.5/frequency_hz)
-        self.executor.submit(do_blink)
+        self.blinking = self.executor.submit(do_blink)
 
     def led(self, on_off):
         self.blinking = False
