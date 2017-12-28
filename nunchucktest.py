@@ -3,6 +3,13 @@
 
 import cwiid
 import time
+import RPi.GPIO as GPIO
+import time
+
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+GPIO.setup(18, GPIO.OUT)
 
 
 LED_1_AND_4_ON = 9
@@ -15,6 +22,8 @@ def pressed(button_state, button_code):
 
 def led(on_off):
     """Turn led <on_off>"""
+    signal = on_off and GPIO.HIGH or GPIO.LOW
+    GPIO.output(18, signal)
     print("LED ", on_off)
 
 
