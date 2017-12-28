@@ -122,6 +122,8 @@ def main():
     wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, True)
     wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, False)
     wii_controller.on_button(cwiid.BTN_A, board_controller.led_blinking)
+    wii_controller.on_button(cwiid.BTN_1, board_controller.led_blinking, 1.0)
+    wii_controller.on_button(cwiid.BTN_2, board_controller.led_blinking, 2.0)
 
     try:
         while wii_controller.connected():
