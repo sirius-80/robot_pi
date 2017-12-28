@@ -100,7 +100,7 @@ class WiimoteControl(object):
     def close(self):
         if self._connected:
             self.rumble(0.5)
-        self.wiimote.close()
+            self.wiimote.close()
         self._connected = False
 
 
