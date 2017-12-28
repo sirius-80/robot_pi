@@ -34,8 +34,8 @@ def rumble(wiimote):
     wiimote.rumble = 0
 
 
-def wiimote_msg_callback(wiimote, msg_list):
-    print("Received", len(msg_list), "messages...")
+def wiimote_msg_callback(msg_list, msg_time):
+    print("Received", len(msg_list), "messages at time", msg_time, "...")
     for msg in msg_list:
         print(msg)
     print("")
