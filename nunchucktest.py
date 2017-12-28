@@ -38,6 +38,7 @@ class WiimoteControl(object):
         self.wiimote.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
         self.wiimote.enable(cwiid.FLAG_MESG_IFC)
         self.wiimote.mesg_callback = self._wii_msg_callback
+        self.wiimote.led = 9
         self.nunchuk_initial_position = self.wiimote.state['nunchuk']['stick']
 
     def _connect(self):
@@ -71,8 +72,8 @@ class WiimoteControl(object):
             if mesg[0] == cwiid.MESG_NUNCHUK:
                 # {'acc': (76, 127, 139), 'buttons': 0, 'stick': (126, 127)}
                 stick = mesg[1]['stick']
-                direction = numpy.subtract(self.nunchuk_initial_position, stick)
-                if direction[0] >= self.STICK_THRESHOLD and direction[1] >= self.STICK_THRESHOLD:
+                direction = numpy.subtract(stick, self.nunchuk_initial_position)
+                if abs(direction[0]) >= self.STICK_THRESHOLD or abs(direction[1]) >= self.STICK_THRESHOLD:
                     print("Direction", direction)
 
     def connected(self):
