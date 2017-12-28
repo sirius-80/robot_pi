@@ -34,6 +34,13 @@ def rumble(wiimote):
     wiimote.rumble = 0
 
 
+def wiimote_msg_callback(msg_list):
+    print("Received", len(msg_list), "messages...")
+    for msg in msg_list:
+        print(msg)
+    print("")
+
+
 def main():
     print('Press button 1 + 2 on your Wii Remote...')
     wm=cwiid.Wiimote()
@@ -47,6 +54,7 @@ def main():
     time.sleep(0.5)
     print wm.state
 
+    wm.mesg_callback = wiimote_msg_callback
     active = True
     nunchuk_initial_position = wm.state['nunchuk']['stick']
     while active:
