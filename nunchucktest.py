@@ -105,8 +105,8 @@ def main():
     board_controller = GpioController()
 
     wii_controller.on_button(cwiid.BTN_HOME, wii_controller.close)
-    wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, [True])
-    wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, [False])
+    wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, True)
+    wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, False)
 
     try:
         while wii_controller.connected():
