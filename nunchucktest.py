@@ -34,10 +34,10 @@ def led(on_off):
 class WiimoteControl(object):
     def __init__(self):
         self._connect()
-        wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
+        self.wiimote.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
         self.wiimote.enable(cwiid.FLAG_MESG_IFC)
         self.wiimote.mesg_callback = self._wii_msg_callback
-        nunchuk_initial_position = wm.state['nunchuk']['stick']
+        nunchuk_initial_position = self.wiimote.state['nunchuk']['stick']
 
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
