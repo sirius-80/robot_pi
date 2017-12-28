@@ -41,7 +41,6 @@ def wiimote_msg_callback(msg_list, msg_time):
             print("Buttons:", msg[1])
         elif msg[0] == cwiid.MESG_NUNCHUK:
             pass
-    print("")
 
 
 def main():
