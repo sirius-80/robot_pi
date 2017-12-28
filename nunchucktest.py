@@ -9,7 +9,9 @@ import time
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(18, GPIO.OUT)
+
+GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)#Button to GPIO23
+GPIO.setup(24, GPIO.OUT)  #LED to GPIO24
 
 
 LED_1_AND_4_ON = 9
@@ -23,7 +25,7 @@ def pressed(button_state, button_code):
 def led(on_off):
     """Turn led <on_off>"""
     signal = on_off and GPIO.HIGH or GPIO.LOW
-    GPIO.output(18, signal)
+    GPIO.output(24, signal)
     print("LED ", on_off)
 
 
@@ -34,7 +36,8 @@ def main():
     print('Wii Remote connected...')
     print('\nPress the HOME button to disconnect the Wii and end the application')
 
-    wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN time.sleep(0.5)
+    wm.rpt_mode = cwiid.RPT_NUNCHUK | cwiid.RPT_BTN
+    time.sleep(0.5)
     print wm.state
 
     active = True
