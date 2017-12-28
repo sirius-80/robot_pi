@@ -20,7 +20,8 @@ class GpioController(object):
         GPIO.add_event_callback(GPIO.BCM, self.led_blinking_fast)
 
     def led_blinking_fast(self):
-        self.led_blinking(10)
+        if not GPIO.input(23):
+            self.led_blinking(10)
 
     def led_blinking(self, frequency_hz=3):
         self.blinking = True
