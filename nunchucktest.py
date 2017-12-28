@@ -45,6 +45,7 @@ class WiimoteControl(object):
         # while not wiimote:
         try:
             self.wiimote = cwiid.Wiimote()
+            self._connected = True
         except:
             traceback.print_exc()
         print('Wii Remote connected...')
@@ -62,8 +63,15 @@ class WiimoteControl(object):
                     self.rumble()
                     led(False)
                     logging.info("LED of")
+                if mesg[1] == cwiid.BTN_HOME:
+                    logging.info("Quiting!")
+                    self._connected = False
+
             if mesg[0] == cwiid.MESG_NUNCHUK:
                 print(mesg[1])
+
+    def connected(self):
+        return self._connected
 
     def rumble(self):
         self.wiimote.rumble = 1
@@ -77,7 +85,7 @@ class WiimoteControl(object):
 def main():
     controller = WiimoteControl()
     try:
-        while True:
+        while controller.connected():
             time.sleep(1)
     finally:
         led(False)
