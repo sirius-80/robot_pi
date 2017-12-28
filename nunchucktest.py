@@ -16,17 +16,22 @@ class GpioController(object):
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
         self.blinking = False
         self.executor = concurrent.futures.ThreadPoolExecutor(4)
+        GPIO.add_event_detect(GPIO.BCM, GPIO.RISING)
+        GPIO.add_event_callback(GPIO.BCM, self.led_blinking_fast)
 
-    def led_blinking(self, on_off):
-        self.blinking = on_off
+    def led_blinking_fast(self):
+        self.led_blinking(10)
+
+    def led_blinking(self, frequency_hz=3):
+        self.blinking = True
+
         def do_blink():
             while self.blinking:
                 self._led(True)
-                time.sleep(.333333/2)
+                time.sleep(0.5/frequency_hz)
                 self._led(False)
-                time.sleep(.333333/2)
-        if on_off:
-            self.executor.submit(do_blink)
+                time.sleep(0.5/frequency_hz)
+        self.executor.submit(do_blink)
 
     def led(self, on_off):
         self.blinking = False
@@ -116,8 +121,7 @@ def main():
     wii_controller.on_button(cwiid.BTN_HOME, wii_controller.close)
     wii_controller.on_button(cwiid.BTN_PLUS, board_controller.led, True)
     wii_controller.on_button(cwiid.BTN_MINUS, board_controller.led, False)
-    wii_controller.on_button(cwiid.BTN_A, board_controller.led_blinking, True)
-    wii_controller.on_button(cwiid.BTN_B, board_controller.led_blinking, False)
+    wii_controller.on_button(cwiid.BTN_A, board_controller.led_blinking)
 
     try:
         while wii_controller.connected():
