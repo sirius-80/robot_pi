@@ -35,10 +35,10 @@ def rumble(wiimote):
 
 
 def wiimote_msg_callback(msg_list, msg_time):
-    print("Received", len(msg_list), "messages at time", msg_time, "...")
+    #print("Received", len(msg_list), "messages at time", msg_time, "...")
     for msg in msg_list:
         if msg[0] == cwiid.MESG_BTN:
-            print("Buttons:", msg[1]['buttons'])
+            print("Buttons:", msg[1])
         elif msg[0] == cwiid.MESG_NUNCHUK:
             pass
     print("")
