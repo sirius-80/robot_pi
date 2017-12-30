@@ -43,7 +43,6 @@ def distance():
 
 
 def main():
-
     try:
         while True:
             dist = distance()

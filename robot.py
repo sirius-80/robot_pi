@@ -10,14 +10,23 @@ import concurrent.futures
 
 class GpioController(object):
     def __init__(self):
+        # GPIO Mode (BOARD / BCM)
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Button to GPIO23
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
+
         self.blinking = False
         self.executor = concurrent.futures.ThreadPoolExecutor(4)
         GPIO.add_event_detect(23, GPIO.RISING)
         GPIO.add_event_callback(23, self.led_blinking_fast)
+        GPIO.setmode(GPIO.BCM)
+
+        # set GPIO Pins for ultra-sound TX module
+        self.GPIO_TRIGGER = 18
+        self.GPIO_ECHO = 17
+        GPIO.setup(self.GPIO_TRIGGER, GPIO.OUT)
+        GPIO.setup(self.GPIO_ECHO, GPIO.IN)
 
     def led_blinking_fast(self, channel):
         self.led_blinking(10)
@@ -46,6 +55,34 @@ class GpioController(object):
         signal = on_off and GPIO.HIGH or GPIO.LOW
         GPIO.output(24, signal)
         logging.info("LED {}", on_off and "on" or "off")
+
+    def distance(self):
+        """Measures and returns current distance in m."""
+        # set Trigger to HIGH
+        GPIO.output(self.GPIO_TRIGGER, True)
+
+        # set Trigger after 0.01ms to LOW
+        time.sleep(0.00001)
+        GPIO.output(self.GPIO_TRIGGER, False)
+
+        start_time = time.time()
+        stop_time = time.time()
+
+        # save StartTime
+        while GPIO.input(self.GPIO_ECHO) == 0:
+            start_time = time.time()
+
+        # save time of arrival
+        while GPIO.input(self.GPIO_ECHO) == 1:
+            stop_time = time.time()
+
+        # time difference between start and arrival
+        time_elapsed = stop_time - start_time
+        # multiply with the sonic speed (343.00 m/s)
+        # and divide by 2, because there and back
+        distance = (time_elapsed * 343.00) / 2
+
+        return distance
 
     def close(self):
         self.led(False)
