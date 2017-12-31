@@ -116,7 +116,7 @@ class GpioController(object):
             self.pwm_left_fwd.ChangeDutyCycle(speed)
         else:
             self.pwm_left_fwd.ChangeDutyCycle(0)
-            self.pwm_left_bck.ChangeDutyCycle(speed)
+            self.pwm_left_bck.ChangeDutyCycle(-speed)
 
     def right_wheel(self, speed):
         if speed > 0:
@@ -124,7 +124,7 @@ class GpioController(object):
             self.pwm_right_fwd.ChangeDutyCycle(speed)
         else:
             self.pwm_right_fwd.ChangeDutyCycle(0)
-            self.pwm_right_bck.ChangeDutyCycle(speed)
+            self.pwm_right_bck.ChangeDutyCycle(-speed)
 
     def close(self):
         self.led(False)
