@@ -194,6 +194,8 @@ class WiimoteControl(object):
 
 
 def main():
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%I:%M:%S %p')
+
     wii_controller = WiimoteControl()
     board_controller = GpioController()
 
