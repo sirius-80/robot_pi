@@ -176,8 +176,7 @@ class WiimoteControl(object):
                 self.last_direction = direction
                 normalized_direction = numpy.divide(direction, (127.0, 127.0))
                 if self.direction_callback_function:
-                    logging.info("calling direction callback {} with normalized direction {}",
-                                 self.direction_callback_function, normalized_direction)
+                    logging.info("calling direction callback with normalized direction {}", normalized_direction)
                     self.direction_callback_function(normalized_direction)
 
     def connected(self):
