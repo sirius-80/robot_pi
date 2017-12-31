@@ -211,8 +211,8 @@ def main():
     def drive_function(direction):
         fwd = direction[1] * 100
         logging.info("Driving {}", fwd)
-        board_controller.pwm_right = fwd
-        board_controller.pwm_right = fwd
+        board_controller.left_wheel(fwd)
+        board_controller.right_wheel(fwd)
 
     wii_controller.on_direction(drive_function)
 
