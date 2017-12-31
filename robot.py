@@ -225,8 +225,11 @@ def main():
         fwd = direction[1] * 100
         ratio = 100 * (direction[0] - 0.5)
         logging.info("Driving %s", fwd)
-        board_controller.left_wheel(min(100, (fwd * ratio)/100*100))
-        board_controller.right_wheel(min(100, (-ratio * fwd)/100*100))
+        left = (fwd + ratio) / 200.0
+        right = (fwd - ratio) / 200.0
+        logging.info("Driving left: %s, right: %s", left, right)
+        board_controller.left_wheel(left)
+        board_controller.right_wheel(right)
 
     wii_controller.on_direction(drive_function)
 
