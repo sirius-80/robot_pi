@@ -175,8 +175,8 @@ class WiimoteControl(object):
                     print("Direction", direction)
                 self.last_direction = direction
                 normalized_direction = numpy.divide(direction, (127.0, 127.0))
-                if self.on_direction:
-                    self.on_direction(normalized_direction)
+                if self.direction_callback_function:
+                    self.direction_callback_function(normalized_direction)
 
     def connected(self):
         return self._connected
@@ -209,14 +209,16 @@ def main():
     def drive_function(direction):
         fwd = direction[1] * 100
         logging.info("Driving {}", fwd)
-        board_controller.pwm_right = direction[1]
-        board_controller.pwm_right = direction[1]
+        board_controller.pwm_right = fwd
+        board_controller.pwm_right = fwd
 
     wii_controller.on_direction(drive_function)
 
     try:
         while wii_controller.connected():
             time.sleep(.1)
+    except KeyboardInterrupt:
+        logging.info("Shutdown")
     finally:
         board_controller.close()
         wii_controller.close()
