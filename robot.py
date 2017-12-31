@@ -188,7 +188,7 @@ class WiimoteControl(object):
                 direction = numpy.subtract(stick, self.STICK_CENTER_POSITION)
                 change = numpy.subtract(self.last_direction, direction)
                 if abs(change[0]) >= self.STICK_THRESHOLD or abs(change[1]) >= self.STICK_THRESHOLD:
-                    normalized_direction = numpy.maximum((100.0, 100.0), numpy.divide(direction, (127.0, 100.0)))
+                    normalized_direction = numpy.maximum((1.0, 1.0), numpy.divide(direction, (127.0, 100.0)))
                     if self.direction_callback_function:
                         logging.info("calling direction callback with normalized direction %s", normalized_direction)
                         self.direction_callback_function(normalized_direction)
