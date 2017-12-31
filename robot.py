@@ -16,17 +16,39 @@ class GpioController(object):
         GPIO.setup(23, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Button to GPIO23
         GPIO.setup(24, GPIO.OUT)  # LED to GPIO24
 
+        self.blinking = None
+        self.executor = None
+        self.GPIO_TRIGGER = 18
+        self.GPIO_ECHO = 17
+        self.pwm_left = None
+        self.pwm_right = None
+
+        self.init_led_and_button()
+        self.init_ultrasound_module()
+        self.init_motor_controls()
+
+    def init_led_and_button(self):
         self.blinking = False
         self.executor = concurrent.futures.ThreadPoolExecutor(4)
         GPIO.add_event_detect(23, GPIO.RISING)
         GPIO.add_event_callback(23, self.led_blinking_fast)
         GPIO.setmode(GPIO.BCM)
 
+    def init_ultrasound_module(self):
         # set GPIO Pins for ultra-sound TX module
-        self.GPIO_TRIGGER = 18
-        self.GPIO_ECHO = 17
         GPIO.setup(self.GPIO_TRIGGER, GPIO.OUT)
         GPIO.setup(self.GPIO_ECHO, GPIO.IN)
+
+    def init_motor_controls(self):
+        # set GPIO for PWM motor control
+        GPIO.setup(6, GPIO.OUT)
+        GPIO.setup(13, GPIO.OUT)
+        GPIO.setup(19, GPIO.OUT)
+        GPIO.setup(26, GPIO.OUT)
+        self.pwm_left = GPIO.PWM(6, 100)
+        self.pwm_right = GPIO.PWM(19, 100)
+        self.pwm_left.start(0)
+        self.pwm_right.start(0)
 
     def led_blinking_fast(self, channel):
         self.led_blinking(10)
@@ -84,8 +106,16 @@ class GpioController(object):
 
         return distance
 
+    def left_wheel(self, speed):
+        self.pwm_left.ChangeDutyCycle(speed)
+
+    def right_wheel(self, speed):
+        self.pwm_right.ChangeDutyCycle(speed)
+
     def close(self):
         self.led(False)
+        self.pwm_left.stop()
+        self.pwm_right.stop()
         GPIO.cleanup()
 
 
@@ -100,11 +130,16 @@ class WiimoteControl(object):
         self.wiimote.mesg_callback = self._wii_msg_callback
         self.wiimote.led = 9
         self.button_callback_functions = {}
+        self.direction_callback_function = None
         # Nunchuk needs some time to start reporting
         time.sleep(.2)
 
     def on_button(self, button, function, *args, **kwargs):
         self.button_callback_functions[button] = (function, args, kwargs)
+
+    def on_direction(self, func):
+        """Provide function that takes direction tuple (left-right, fwd-backward) as input"""
+        self.direction_callback_function = func
 
     def _connect(self):
         print('Press button 1 + 2 on your Wii Remote...')
@@ -139,6 +174,9 @@ class WiimoteControl(object):
                 if abs(change[0]) >= self.STICK_THRESHOLD or abs(change[1]) >= self.STICK_THRESHOLD:
                     print("Direction", direction)
                 self.last_direction = direction
+                normalized_direction = numpy.divide(direction, (127.0, 127.0))
+                if self.on_direction:
+                    self.on_direction(normalized_direction)
 
     def connected(self):
         return self._connected
@@ -165,6 +203,14 @@ def main():
     wii_controller.on_button(cwiid.BTN_A, board_controller.led_blinking)
     wii_controller.on_button(cwiid.BTN_1, board_controller.led_blinking, 1.0)
     wii_controller.on_button(cwiid.BTN_2, board_controller.led_blinking, 2.0)
+
+    def drive_function(direction):
+        fwd = direction[1] * 100
+        logging.info("Driving {}", fwd)
+        board_controller.pwm_right = direction[1]
+        board_controller.pwm_right = direction[1]
+
+    wii_controller.on_direction(drive_function)
 
     try:
         while wii_controller.connected():
