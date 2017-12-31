@@ -45,10 +45,14 @@ class GpioController(object):
         GPIO.setup(13, GPIO.OUT)
         GPIO.setup(19, GPIO.OUT)
         GPIO.setup(26, GPIO.OUT)
-        self.pwm_left = GPIO.PWM(6, 100)
-        self.pwm_right = GPIO.PWM(19, 100)
-        self.pwm_left.start(0)
-        self.pwm_right.start(0)
+        self.pwm_left_fwd = GPIO.PWM(6, 100)
+        self.pwm_left_bck = GPIO.PWM(13, 100)
+        self.pwm_right_fwd = GPIO.PWM(19, 100)
+        self.pwm_right_bck = GPIO.PWM(26, 100)
+        self.pwm_left_fwd.start(0)
+        self.pwm_left_bck.start(0)
+        self.pwm_right_fwd.start(0)
+        self.pwm_right_bck.start(0)
 
     def led_blinking_fast(self, channel):
         self.led_blinking(10)
@@ -107,15 +111,27 @@ class GpioController(object):
         return distance
 
     def left_wheel(self, speed):
-        self.pwm_left.ChangeDutyCycle(speed)
+        if speed > 0:
+            self.pwm_left_bck.ChangeDutyCycle(0)
+            self.pwm_left_fwd.ChangeDutyCycle(speed)
+        else:
+            self.pwm_left_fwd.ChangeDutyCycle(0)
+            self.pwm_left_bck.ChangeDutyCycle(speed)
 
     def right_wheel(self, speed):
-        self.pwm_right.ChangeDutyCycle(speed)
+        if speed > 0:
+            self.pwm_right_bck.ChangeDutyCycle(0)
+            self.pwm_right_fwd.ChangeDutyCycle(speed)
+        else:
+            self.pwm_right_fwd.ChangeDutyCycle(0)
+            self.pwm_right_bck.ChangeDutyCycle(speed)
 
     def close(self):
         self.led(False)
-        self.pwm_left.stop()
-        self.pwm_right.stop()
+        self.pwm_left_fwd.stop()
+        self.pwm_left_bck.stop()
+        self.pwm_right_fwd.stop()
+        self.pwm_right_bck.stop()
         GPIO.cleanup()
 
 
