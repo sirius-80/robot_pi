@@ -225,8 +225,10 @@ def main():
         fwd = direction[1] * 100
         ratio = 100 * (direction[0] - 0.5)
         logging.info("Driving %s", fwd)
-        left = (fwd + ratio) / 200.0
-        right = (fwd - ratio) / 200.0
+        left = fwd + ratio
+        right = fwd - ratio
+        left = numpy.sign(left) * (min(100.0, abs(left)))
+        right = numpy.sign(right) * (min(100.0, abs(right)))
         logging.info("Driving left: %s, right: %s", left, right)
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
