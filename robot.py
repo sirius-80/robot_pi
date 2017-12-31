@@ -76,7 +76,7 @@ class GpioController(object):
         """Turn led (connected to pin 24) <on_off>"""
         signal = on_off and GPIO.HIGH or GPIO.LOW
         GPIO.output(24, signal)
-        logging.info("LED {}", on_off and "on" or "off")
+        logging.info("LED %s", on_off and "on" or "off")
 
     def distance(self):
         """Measures and returns current distance in m."""
@@ -142,15 +142,15 @@ class WiimoteControl(object):
         self.direction_callback_function = func
 
     def _connect(self):
-        print('Press button 1 + 2 on your Wii Remote...')
+        logging.warn('Press button 1 + 2 on your Wii Remote...')
         self.wiimote = None
         self._connected = False
         while not self.wiimote:
             try:
                 self.wiimote = cwiid.Wiimote()
                 self._connected = True
-                print('Wii Remote connected...')
-                print('\nPress the HOME button to disconnect the Wii and end the application')
+                logging.info('Wii Remote connected...')
+                logging.info('Press the HOME button to disconnect the Wii and end the application')
                 self.rumble()
             except RuntimeError:
                 logging.warn("Timed out waiting for wii-remote, trying again...")
@@ -172,12 +172,11 @@ class WiimoteControl(object):
                 direction = numpy.subtract(stick, self.STICK_CENTER_POSITION)
                 change = numpy.subtract(self.last_direction, direction)
                 if abs(change[0]) >= self.STICK_THRESHOLD or abs(change[1]) >= self.STICK_THRESHOLD:
-                    print("Direction", direction)
+                    normalized_direction = numpy.divide(direction, (127.0, 127.0))
+                    if self.direction_callback_function:
+                        logging.info("calling direction callback with normalized direction %s", normalized_direction)
+                        self.direction_callback_function(normalized_direction)
                 self.last_direction = direction
-                normalized_direction = numpy.divide(direction, (127.0, 127.0))
-                if self.direction_callback_function:
-                    logging.info("calling direction callback with normalized direction {}", normalized_direction)
-                    self.direction_callback_function(normalized_direction)
 
     def connected(self):
         return self._connected
@@ -208,7 +207,7 @@ def main():
 
     def drive_function(direction):
         fwd = direction[1] * 100
-        logging.info("Driving {}", fwd)
+        logging.info("Driving %s", fwd)
         board_controller.left_wheel(fwd)
         board_controller.right_wheel(fwd)
 
