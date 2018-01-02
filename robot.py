@@ -80,7 +80,7 @@ class GpioController(object):
         """Turn led (connected to pin 24) <on_off>"""
         signal = on_off and GPIO.HIGH or GPIO.LOW
         GPIO.output(24, signal)
-        logging.info("LED %s", on_off and "on" or "off")
+        logging.debug("LED %s", on_off and "on" or "off")
 
     def distance(self):
         """Measures and returns current distance in m."""
@@ -190,7 +190,7 @@ class WiimoteControl(object):
                 if abs(change[0]) >= self.STICK_THRESHOLD or abs(change[1]) >= self.STICK_THRESHOLD:
                     normalized_direction = numpy.minimum((1.0, 1.0), numpy.divide(direction, (127.0, 100.0)))
                     if self.direction_callback_function:
-                        logging.info("calling direction callback with normalized direction %s", normalized_direction)
+                        logging.debug("calling direction callback with normalized direction %s", normalized_direction)
                         self.direction_callback_function(normalized_direction)
                 self.last_direction = direction
 
@@ -249,23 +249,25 @@ def main():
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
 
-    def drive_function(direction):
-        fwd = direction[1] * 100
-        ratio = 100 * (direction[0] - 0.5)
-        logging.info("Driving %s", fwd)
-        left = fwd + ratio
-        right = fwd - ratio
-        left = numpy.sign(left) * (min(100.0, abs(left)))
-        right = numpy.sign(right) * (min(100.0, abs(right)))
-        logging.info("Driving left: %s, right: %s", left, right)
-        board_controller.left_wheel(left)
-        board_controller.right_wheel(right)
-
     wii_controller.on_direction(wheels)
 
     try:
         while wii_controller.connected():
             time.sleep(.1)
+            free_space = board_controller.distance()
+            if free_space < .1
+                board_controller.led_blinking(10)
+            elif free_space < .2
+                board_controller.led_blinking(5)
+            elif free_space < .3
+                board_controller.led_blinking(3)
+            elif free_space < .5
+                board_controller.led_blinking(2)
+            elif free_space < 1.0:
+                board_controller.led_blinking(1)
+            else:
+                board_controller.led(False)
+
     except KeyboardInterrupt:
         logging.info("Shutdown")
     finally:
