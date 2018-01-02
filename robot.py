@@ -210,7 +210,7 @@ class WiimoteControl(object):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%I:%M:%S %p')
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s - %(message)s')
     wii_controller = WiimoteControl()
     board_controller = GpioController()
 
@@ -243,6 +243,8 @@ def main():
 
         left = 100 * left
         right = 100 * right
+
+        logging.debug("wheels(%.1f, %.1f) => (%d, %d)", x, y, left, right)
 
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
