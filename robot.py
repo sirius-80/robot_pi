@@ -221,6 +221,28 @@ def main():
     wii_controller.on_button(cwiid.BTN_1, board_controller.led_blinking, 1.0)
     wii_controller.on_button(cwiid.BTN_2, board_controller.led_blinking, 2.0)
 
+    def wheels(direction):
+        (x, y) = direction
+        left = 0
+        right = 0
+        EPSILON = .02
+        if numpy.linalg.norm((x, y)) > EPSILON:
+            if abs(y) < EPSILON:
+                # Turn in place
+                left = x
+                right = -x
+            elif y > 0:
+                # forward
+                left = direction(x, y) * abs(y)
+                right = direction(x, y) * numpy.linalg.norm((x, y))
+            else: # y < 0:
+                # backward
+                left = direction(x, y) * numpy.linalg.norm((x, y))
+                right = direction(x, y) * abs(y)
+
+        board_controller.left_wheel(left)
+        board_controller.right_wheel(right)
+
     def drive_function(direction):
         fwd = direction[1] * 100
         ratio = 100 * (direction[0] - 0.5)
@@ -233,7 +255,7 @@ def main():
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
 
-    wii_controller.on_direction(drive_function)
+    wii_controller.on_direction(wheels)
 
     try:
         while wii_controller.connected():
