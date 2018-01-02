@@ -241,6 +241,9 @@ def main():
                 left = d * numpy.linalg.norm((x, y))
                 right = d * abs(y)
 
+        left = 100 * left
+        right = 100 * right
+
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
 
