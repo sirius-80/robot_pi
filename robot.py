@@ -255,13 +255,13 @@ def main():
         while wii_controller.connected():
             time.sleep(.1)
             free_space = board_controller.distance()
-            if free_space < .1
+            if free_space < .1:
                 board_controller.led_blinking(10)
-            elif free_space < .2
+            elif free_space < .2:
                 board_controller.led_blinking(5)
-            elif free_space < .3
+            elif free_space < .3:
                 board_controller.led_blinking(3)
-            elif free_space < .5
+            elif free_space < .5:
                 board_controller.led_blinking(2)
             elif free_space < 1.0:
                 board_controller.led_blinking(1)
