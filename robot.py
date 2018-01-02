@@ -225,13 +225,13 @@ def main():
         (x, y) = direction
         left = 0
         right = 0
-        EPSILON = .02
+        EPSILON = .1
         d = numpy.sign(y)
         if numpy.linalg.norm(direction) > EPSILON:
             if abs(y) < EPSILON:
                 # Turn in place
-                left = x
-                right = -x
+                left = -x
+                right = x
             elif y > 0:
                 # forward
                 left = d * abs(y)
