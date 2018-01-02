@@ -226,19 +226,20 @@ def main():
         left = 0
         right = 0
         EPSILON = .02
-        if numpy.linalg.norm((x, y)) > EPSILON:
+        d = numpy.sign(y)
+        if numpy.linalg.norm(direction) > EPSILON:
             if abs(y) < EPSILON:
                 # Turn in place
                 left = x
                 right = -x
             elif y > 0:
                 # forward
-                left = direction(x, y) * abs(y)
-                right = direction(x, y) * numpy.linalg.norm((x, y))
+                left = d * abs(y)
+                right = d * numpy.linalg.norm((x, y))
             else: # y < 0:
                 # backward
-                left = direction(x, y) * numpy.linalg.norm((x, y))
-                right = direction(x, y) * abs(y)
+                left = d * numpy.linalg.norm((x, y))
+                right = d * abs(y)
 
         board_controller.left_wheel(left)
         board_controller.right_wheel(right)
