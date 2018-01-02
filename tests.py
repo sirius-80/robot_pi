@@ -32,22 +32,28 @@ def right_wheel(x, y):
 
 
 def wheels(x, y):
-    if numpy.linalg.norm((x, y)) < 1:
-        return (0, 0)
+    direction = (x, y)
+    left = 0
+    right = 0
+    EPSILON = .1
+    d = numpy.sign(y)
+    if numpy.linalg.norm(direction) > EPSILON:
+        if abs(y) < EPSILON:
+            # Turn in place
+            left = -x
+            right = x
+        elif x < 0:
+            # forward
+            left = d * abs(y)
+            right = d * numpy.linalg.norm((x, y))
+        else:  # y < 0:
+            # backward
+            left = d * numpy.linalg.norm((x, y))
+            right = d * abs(y)
 
-    d = direction(x, y)
-    if d > 0:
-        left = direction(x, y) * abs(y)
-        right= direction(x, y) * numpy.linalg.norm((x, y))
-    elif d < 0:
-        left = direction(x, y) * numpy.linalg.norm((x, y))
-        right= direction(x, y) * abs(y)
-    else:
-        left = x
-        right = -x
-
+    #left = 100 * left
+    #right = 100 * right
     return (left, right)
-
 
 
 if __name__ == "__main__":

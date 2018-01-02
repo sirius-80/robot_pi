@@ -232,11 +232,11 @@ def main():
                 # Turn in place
                 left = -x
                 right = x
-            elif y > 0:
+            elif x < 0:
                 # forward
                 left = d * abs(y)
                 right = d * numpy.linalg.norm((x, y))
-            else: # y < 0:
+            else:  # x > 0:
                 # backward
                 left = d * numpy.linalg.norm((x, y))
                 right = d * abs(y)
